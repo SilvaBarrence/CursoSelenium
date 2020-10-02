@@ -4,16 +4,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class TestesDeCadastroDeUsuario {
+public class SistemaDeUsuario {
 
     private ChromeDriver driver;
     private HomeTrainingPage usuarios;
+    private String xpath;
 
     @Before
     public void inicializa() {
@@ -32,7 +33,7 @@ public class TestesDeCadastroDeUsuario {
     public void cadastrarUmNovoUsuarioSoComNomeEmail() {
 
         usuarios.visitaSiteTreinamento();
-        usuarios.irParaPaginaDeCriarUsuario().preencheFormulario("aaaaaa","souzin" ,"gabriel@teste.com");
+        usuarios.irParaPaginaDeCriarUsuario().preencheFormulario("aaaaaa", "souzin", "gabriel@teste.com");
 
         //Captura alerta de Criação de usuário com sucesso
         WebElement usuarioNovoCriado = driver.findElement(By.id("notice"));
@@ -68,5 +69,18 @@ public class TestesDeCadastroDeUsuario {
                 "Email translation missing: pt-BR.activerecord.errors.models.user.attributes.email.blank\n" +
                 "Email translation missing: pt-BR.activerecord.errors.models.user.attributes.email.invalid", erroAoCriarUsuario.getText());
 
+    }
+
+    @Test
+    public void excluirUsuario() throws InterruptedException {
+        String pathDelete = "//a[contains(@href,'/users/3354') and @data-method='delete']";
+        String pathEmail = "//td[contains(text(),'aaba@test.com')]";
+        usuarios.visitaSiteTreinamento();
+        usuarios.irParaListaDeUsuario().excluirUsuario(pathDelete);
+        try {
+            driver.findElement(By.xpath(pathEmail));
+        } catch (NoSuchElementException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }
